@@ -1,19 +1,18 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "standalone-server.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/standalone-server.js"
+      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/standalone-server.js"
+      "dest": "/public/$1"
     }
   ]
 }
