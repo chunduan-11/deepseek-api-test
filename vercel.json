@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "standalone-server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/standalone-server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/standalone-server.js"
+    }
+  ],
+  "env": {
+    "DEEPSEEK_API_KEY": "@deepseek_api_key"
+  }
+}

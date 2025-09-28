@@ -1,0 +1,31 @@
+{
+  "name": "deepseek-api-test",
+  "version": "1.0.0",
+  "description": "DeepSeek API 云端测试工具 - 支持流式输出和思考过程展示",
+  "main": "standalone-server.js",
+  "scripts": {
+    "start": "node standalone-server.js",
+    "dev": "node standalone-server.js",
+    "deploy": "./deploy.sh"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "deepseek", 
+    "api", 
+    "ai", 
+    "streaming", 
+    "reasoning", 
+    "chat", 
+    "cloud-deployment"
+  ],
+  "author": "DeepSeek API Test Tool",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/deepseek-api-test.git"
+  },
+  "homepage": "https://your-project.vercel.app"
+}
