@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store';
 import { Gem } from '../components/Gem';
@@ -18,8 +17,6 @@ export const Game: React.FC = () => {
   const reserveCard = useGameStore(state => state.reserveCard);
   const buyCard = useGameStore(state => state.buyCard);
   const aiTurn = useGameStore(state => state.aiTurn);
-
-  const [showActions, setShowActions] = useState(false);
 
   useEffect(() => {
     if (!gameState) {
@@ -43,17 +40,15 @@ export const Game: React.FC = () => {
   const isAI = currentPlayer.isAI;
   const gemTypes = ['emerald', 'sapphire', 'ruby', 'diamond', 'onyx', 'gold'] as const;
 
-  const handleBuyCard = (card, fromReserve = false) => {
+  const handleBuyCard = (card: any, fromReserve = false) => {
     if (!isAI) {
       buyCard(card, fromReserve);
-      setShowActions(false);
     }
   };
 
-  const handleReserveCard = (card) => {
+  const handleReserveCard = (card: any) => {
     if (!isAI) {
       reserveCard(card);
-      setShowActions(false);
     }
   };
 
@@ -64,154 +59,200 @@ export const Game: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-yellow-400">💎 璀璨宝石</h1>
-          <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors"
-          >
-            返回
-          </button>
-        </div>
-
-        {gameState.players[1] && (
-          <div className="mb-6">
-            <PlayerArea 
-              player={gameState.players[1]} 
-              isCurrent={gameState.currentPlayer === 1}
-            />
-          </div>
-        )}
-
-        <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-4">
-          <div className="flex justify-center gap-4 mb-6 flex-wrap">
-            {gameState.board.nobles.map(noble => (
-              <Noble key={noble.id} noble={noble} />
-            ))}
+    <div className="min-h-screen relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-950 to-indigo-950 opacity-90" />
+      
+      <div className="relative z-10 min-h-screen p-4 md:p-6 overflow-y-auto scrollbar-thin">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex justify-between items-center glass-effect rounded-xl px-6 py-4 shadow-luxury">
+            <h1 className="text-2xl font-bold prestige-text">💎 璀璨宝石</h1>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              返回首页
+            </button>
           </div>
 
-          <div className="flex justify-center gap-4 mb-6 flex-wrap">
-            {gemTypes.map(gem => (
-              <Gem
-                key={gem}
-                type={gem}
-                count={gameState.gems[gem]}
-                onClick={!isAI && gem !== 'gold' ? () => selectGem(gem) : undefined}
-                selected={gameState.selectedGems.includes(gem)}
-                size="large"
+          {gameState.players[1] && (
+            <div className="animate-slide-up">
+              <PlayerArea 
+                player={gameState.players[1]} 
+                isCurrent={gameState.currentPlayer === 1}
               />
-            ))}
-          </div>
+            </div>
+          )}
 
-          <div className="space-y-4">
-            {[3, 2, 1].map(level => (
-              <div key={level} className="flex justify-center gap-2 flex-wrap">
-                {gameState.board[`level${level}`].map(card => (
-                  <Card
-                    key={card.id}
-                    card={card}
-                    onClick={() => !isAI && selectCard(card)}
-                    selected={gameState.selectedCard?.id === card.id}
-                    canAfford={canAffordCard(currentPlayer, card)}
-                  />
+          <div className="glass-effect rounded-2xl p-6 shadow-luxury animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                <span>👑</span>
+                <span>贵族</span>
+              </h2>
+              <div className="flex justify-center gap-4 flex-wrap">
+                {gameState.board.nobles.map(noble => (
+                  <div key={noble.id} className="transform hover:scale-110 transition-transform">
+                    <Noble noble={noble} />
+                  </div>
                 ))}
-                <div className="w-24 h-32 bg-gray-700/30 rounded-xl flex items-center justify-center">
-                  <span className="text-gray-400 text-xs">
-                    {gameState.deck[`level${level}`].length} 张
-                  </span>
-                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <PlayerArea 
-          player={gameState.players[0]} 
-          isCurrent={gameState.currentPlayer === 0}
-        />
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                <span>💎</span>
+                <span>宝石</span>
+              </h2>
+              <div className="flex justify-center gap-4 flex-wrap">
+                {gemTypes.map(gem => (
+                  <div 
+                    key={gem} 
+                    className={`transform hover:scale-110 transition-all ${!isAI && gem !== 'gold' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                    onClick={() => !isAI && gem !== 'gold' && selectGem(gem)}
+                  >
+                    <Gem
+                      type={gem}
+                      count={gameState.gems[gem]}
+                      selected={gameState.selectedGems.includes(gem)}
+                      size="large"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {!isAI && (
-          <div className="mt-6">
-            {gameState.selectedGems.length > 0 && (
-              <div className="mb-4 bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    {gameState.selectedGems.map((gem, idx) => (
-                      <Gem 
-                        key={idx} 
-                        type={gem} 
-                        onClick={() => deselectGem(gem)}
-                        selected
-                      />
+            <div className="space-y-4">
+              {[3, 2, 1].map(level => (
+                <div key={level} className="card-shine">
+                  <div className="mb-2 text-sm font-medium text-gray-400 flex items-center gap-2">
+                    <span>等级 {level}</span>
+                    <span className="text-xs">({gameState.deck[`level${level}`].length} 张牌)</span>
+                  </div>
+                  <div className="flex justify-center gap-3 flex-wrap">
+                    {gameState.board[`level${level}`].map(card => (
+                      <div 
+                        key={card.id} 
+                        className="transform hover:scale-110 transition-all"
+                        onClick={() => !isAI && selectCard(card)}
+                      >
+                        <Card
+                          card={card}
+                          selected={gameState.selectedCard?.id === card.id}
+                          canAfford={canAffordCard(currentPlayer, card)}
+                        />
+                      </div>
                     ))}
                   </div>
-                  <button
-                    onClick={handleTakeGems}
-                    className="px-6 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400 transition-colors"
-                  >
-                    拿取宝石
-                  </button>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
 
-            {gameState.selectedCard && (
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="flex items-center gap-4">
-                  <Card card={gameState.selectedCard} selected />
-                  <div className="flex gap-2">
-                    {canAffordCard(currentPlayer, gameState.selectedCard) && (
-                      <button
-                        onClick={() => handleBuyCard(gameState.selectedCard)}
-                        className="px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400 transition-colors"
-                      >
-                        购买
-                      </button>
-                    )}
-                    {currentPlayer.reservedCards.length < 3 && (
-                      <button
-                        onClick={() => handleReserveCard(gameState.selectedCard)}
-                        className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition-colors"
-                      >
-                        保留
-                      </button>
-                    )}
+          <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <PlayerArea 
+              player={gameState.players[0]} 
+              isCurrent={gameState.currentPlayer === 0}
+            />
+          </div>
+
+          {!isAI && (
+            <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              {gameState.selectedGems.length > 0 && (
+                <div className="glass-effect rounded-xl p-6 shadow-luxury">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex gap-3 flex-wrap">
+                      {gameState.selectedGems.map((gem, idx) => (
+                        <div 
+                          key={idx} 
+                          className="cursor-pointer transform hover:scale-110 transition-transform"
+                          onClick={() => deselectGem(gem)}
+                        >
+                          <Gem type={gem} selected size="large" />
+                        </div>
+                      ))}
+                    </div>
                     <button
-                      onClick={() => selectCard(null)}
-                      className="px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-400 transition-colors"
+                      onClick={handleTakeGems}
+                      className="luxury-button px-8 py-3 text-gray-900 font-bold rounded-lg"
                     >
-                      取消
+                      拿取宝石 💎
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {currentPlayer.reservedCards.length > 0 && !gameState.selectedCard && (
-              <div className="mt-4 bg-white/10 backdrop-blur rounded-xl p-4">
-                <h3 className="text-white font-bold mb-2">保留的卡牌</h3>
-                <div className="flex gap-2 flex-wrap">
-                  {currentPlayer.reservedCards.map(card => (
-                    <Card
-                      key={card.id}
-                      card={card}
-                      onClick={() => selectCard(card)}
-                      canAfford={canAffordCard(currentPlayer, card)}
-                    />
-                  ))}
+              {gameState.selectedCard && (
+                <div className="glass-effect rounded-xl p-6 shadow-luxury">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="transform hover:scale-105 transition-transform">
+                      <Card card={gameState.selectedCard} selected />
+                    </div>
+                    <div className="flex gap-3 flex-wrap">
+                      {canAffordCard(currentPlayer, gameState.selectedCard) && (
+                        <button
+                          onClick={() => handleBuyCard(gameState.selectedCard)}
+                          className="luxury-button px-6 py-3 text-gray-900 font-bold rounded-lg"
+                        >
+                          购买 🛒
+                        </button>
+                      )}
+                      {currentPlayer.reservedCards.length < 3 && (
+                        <button
+                          onClick={() => handleReserveCard(gameState.selectedCard)}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-400 hover:to-indigo-500 transition-all shadow-lg"
+                        >
+                          保留 📇
+                        </button>
+                      )}
+                      <button
+                        onClick={() => selectCard(null)}
+                        className="px-6 py-3 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-500 transition-all"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {isAI && (
-              <div className="text-center py-8">
-                <p className="text-white text-xl animate-pulse">🤖 AI 正在思考...</p>
-              </div>
-            )}
-          </div>
-        )}
+              {currentPlayer.reservedCards.length > 0 && !gameState.selectedCard && (
+                <div className="glass-effect rounded-xl p-6 shadow-luxury">
+                  <h3 className="text-lg font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                    <span>📇</span>
+                    <span>保留的卡牌</span>
+                  </h3>
+                  <div className="flex gap-3 flex-wrap">
+                    {currentPlayer.reservedCards.map(card => (
+                      <div 
+                        key={card.id} 
+                        className="transform hover:scale-110 transition-all cursor-pointer"
+                        onClick={() => selectCard(card)}
+                      >
+                        <Card
+                          card={card}
+                          canAfford={canAffordCard(currentPlayer, card)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isAI && (
+            <div className="glass-effect rounded-xl p-8 shadow-luxury text-center">
+              <div className="text-4xl mb-4 animate-pulse">🤖</div>
+              <p className="text-xl text-gray-300 animate-pulse">AI 正在思考...</p>
+            </div>
+          )}
+
+          {currentPlayer.reservedCards.length === 0 && !gameState.selectedCard && gameState.selectedGems.length === 0 && !isAI && (
+            <div className="glass-effect rounded-xl p-6 shadow-luxury text-center">
+              <p className="text-gray-400">👆 点击宝石或卡牌开始你的回合</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
